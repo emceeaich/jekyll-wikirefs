@@ -23,9 +23,13 @@ module Jekyll
         @site.link_index = LinkIndex.new(@site)
 
         @site.doc_mngr.all.each do |doc|
-          filename = File.basename(doc.basename, File.extname(doc.basename))
-          @parser.parse(filename, doc.content)
-          @site.link_index.populate(doc, @parser.wikilink_blocks, @parser.wikilink_inlines)
+          if doc.content.nil?
+            Jekyll.logger.debug "Skipping:", "Content in #{doc.relative_path} is nil"
+          elsif
+            filename = File.basename(doc.basename, File.extname(doc.basename))
+            @parser.parse(filename, doc.content)
+            @site.link_index.populate(doc, @parser.wikilink_blocks, @parser.wikilink_inlines)
+          end
         end
         # wait until all docs are processed before assigning backward facing metadata,
         # this ensures all attributed/backlinks are collected for assignment
